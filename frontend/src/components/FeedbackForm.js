@@ -1,42 +1,53 @@
+// src/components/FeedbackForm.js
 import React, { useState } from "react";
+import { Form, Button, Card } from 'react-bootstrap';
+import { Rating } from 'react-simple-star-rating'; // <-- Import
 
-function FeedbackForm({ onSubmit }) {
-  const [username, setUsername] = useState("");
-  const [message, setMessage] = useState("");
+// Pass in existing feedback for "Edit" mode
+function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
+  const [username, setUsername] = useState(existingFeedback?.username || "");
+  const [message, setMessage] = useState(existingFeedback?.message || "");
+  const [rating, setRating] = useState(existingFeedback?.rating || 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!username || !message) return;
-    onSubmit({ username, message });
-    setUsername("");
-    setMessage("");
+    if (!username || !message || rating === 0) return;
+    onSubmit({ username, message, rating });
+
+    // Only clear if it's NOT an edit form
+    if (!existingFeedback) {
+      setUsername("");
+      setMessage("");
+      setRating(0);
+    }
+    if (handleClose) handleClose(); // Close modal if in one
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card p-4 mb-4 shadow">
-      <h5>Add Feedback</h5>
+    <Card className="p-4 mb-4 shadow">
+      <Form onSubmit={handleSubmit}>
+        <h5 className="mb-3">{existingFeedback ? "Edit" : "Add"} Feedback</h5>
 
-      <div className="mb-3">
-        <label className="form-label">Your Name</label>
-        <input
-          type="text"
-          className="form-control"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+        <Rating
+          onClick={(rate) => setRating(rate)}
+          initialValue={rating}
+          size={30}
+          className="mb-3"
         />
-      </div>
 
-      <div className="mb-3">
-        <label className="form-label">Your Feedback</label>
-        <textarea
-          className="form-control"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        ></textarea>
-      </div>
+        <Form.Group className="mb-3">
+          <Form.Label>Your Name</Form.Label>
+          <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </Form.Group>
 
-      <button className="btn btn-primary w-100">Submit</button>
-    </form>
+        <Form.Group className="mb-3">
+          <Form.Label>Your Feedback</Form.Label>
+          <Form.Control as="textarea" value={message} onChange={(e) => setMessage(e.target.value)} />
+        </Form.Group>
+
+        <Button className="btn btn-primary w-100" type="submit">Submit</Button>
+      </Form>
+    </Card>
   );
 }
 

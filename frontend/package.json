@@ -10,8 +10,13 @@
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "react": "^19.2.0",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",
+    "react-paginate": "^8.3.0",
+    "react-router-dom": "^7.9.6",
     "react-scripts": "^5.0.1",
+    "react-simple-star-rating": "^5.1.7",
+    "react-transition-group": "^4.4.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

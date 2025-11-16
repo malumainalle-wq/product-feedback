@@ -14,6 +14,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/product_feedback")
 // Routes
 const feedbackRoutes = require("./routes/feedbackRoutes");
 app.use("/api/feedbacks", feedbackRoutes);
+app.use("/api/auth", require("./routes/authRoutes"));
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
