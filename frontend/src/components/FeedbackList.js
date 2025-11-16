@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { Card, Button, Modal, Row, Col } from 'react-bootstrap';
+import { Card, Button, Modal, Row, Col, Badge } from 'react-bootstrap'; // <-- Import Badge
 import { Rating } from 'react-simple-star-rating';
 import FeedbackForm from "./FeedbackForm";
 
-// `adminMode` will show edit/delete buttons
 function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
   const { token } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
@@ -23,7 +22,7 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
     await axios.put(`http://localhost:5000/api/feedbacks/${selected._id}`, feedbackData, {
       headers: { 'x-auth-token': token }
     });
-    onFeedbackUpdate(); // Tell parent to re-fetch
+    onFeedbackUpdate();
     closeEdit();
   };
 
@@ -31,19 +30,26 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
     await axios.delete(`http://localhost:5000/api/feedbacks/${selected._id}`, {
       headers: { 'x-auth-token': token }
     });
-    onFeedbackUpdate(); // Tell parent to re-fetch
+    onFeedbackUpdate();
     closeDelete();
   };
 
   return (
     <div>
       {feedbacks.length === 0 ? (
-        <p className="text-muted text-center">No feedback yet.</p>
+        <p className="text-muted text-center">No feedback found for these filters.</p>
       ) : (
         feedbacks.map((fb) => (
           <Card key={fb._id} className="p-3 mb-3 shadow-sm">
             <Row>
               <Col>
+                {/* --- NEW PRODUCT/CATEGORY INFO --- */}
+                <div className="mb-2">
+                  <Badge bg="secondary" className="me-2">{fb.category}</Badge>
+                  <span className="fw-bold">{fb.product?.name || 'Product'}</span> 
+                </div>
+                {/* ---------------------------------- */}
+
                 <h6 className="fw-bold">{fb.username}</h6>
                 <p>{fb.message}</p>
               </Col>
@@ -67,11 +73,13 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
           <Modal.Title>Edit Feedback</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {/* Pass the full selected feedback object to the form */}
           <FeedbackForm onSubmit={handleEdit} existingFeedback={selected} handleClose={closeEdit} />
         </Modal.Body>
       </Modal>
 
       {/* Delete Confirmation Modal */}
+      {/* ... (this modal remains the same as your file) ... */}
       <Modal show={showDelete} onHide={closeDelete}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
