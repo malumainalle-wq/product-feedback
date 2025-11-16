@@ -6,12 +6,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 // --- You might run this once to create your admin ---
-// router.post("/register", async (req, res) => {
-//   const { username, password } = req.body;
-//   const hashedPassword = await bcrypt.hash(password, 10);
-//   const user = await User.create({ username, password: hashedPassword });
-//   res.json(user);
-// });
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({ username, password: hashedPassword });
+  res.json(user);
+});
 
 // --- This is your main login route ---
 router.post("/login", async (req, res) => {

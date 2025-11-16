@@ -1,31 +1,37 @@
-// src/App.js
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import AppNavbar from './components/AppNavbar';
-import HomePage from './components/HomePage'; // We will create this
-import LoginPage from './components/LoginPage';
-import AdminDashboard from './components/AdminDashboard'; // We will create this
-import ProtectedRoute from './components/ProtectedRoute'; // We will create this
+// src/components/AppNavbar.js
+// (Paste this correct code into your file)
 
-function App() {
+import React from 'react';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+function AppNavbar() {
+  const { isAuth, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
-    <AuthProvider>
-      <AppNavbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route 
-          path="/admin" 
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } 
-        />
-      </Routes>
-    </AuthProvider>
+    <Navbar bg="primary" variant="dark" expand="lg" className="mb-4">
+      <Container>
+        <Navbar.Brand as={Link} to="/">Feedback System</Navbar.Brand>
+        <Nav className="ms-auto">
+          {isAuth ? (
+            <>
+              <Nav.Link as={Link} to="/admin">Admin Dashboard</Nav.Link>
+              <Button variant="outline-light" onClick={handleLogout}>Logout</Button>
+            </>
+          ) : (
+            <Nav.Link as={Link} to="/login">Admin Login</Nav.Link>
+          )}
+        </Nav>
+      </Container>
+    </Navbar>
   );
 }
 
-export default App;
+export default AppNavbar;
