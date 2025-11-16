@@ -1,6 +1,7 @@
 // src/components/FeedbackForm.js
 import React, { useState, useEffect } from "react";
-import { Form, Button, Card, Row, Col } from 'react-bootstrap';
+// <-- Import Image -->
+import { Form, Button, Card, Row, Col, Image } from 'react-bootstrap';
 import { Rating } from 'react-simple-star-rating';
 import axios from 'axios';
 
@@ -9,32 +10,35 @@ function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
   const [message, setMessage] = useState(existingFeedback?.message || "");
   const [rating, setRating] = useState(existingFeedback?.rating || 0);
 
-  // New state for categories and products
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(existingFeedback?.category || "");
   
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(existingFeedback?.product?._id || "");
 
-  // 1. Fetch all categories on component mount
+  // --- NEW: State for product image preview ---
+  const [selectedProductImage, setSelectedProductImage] = useState(null);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/products/categories");
         setCategories(res.data);
 
-        // If editing, load the products for the existing category
         if (existingFeedback?.category) {
           fetchProducts(existingFeedback.category);
+        }
+        // --- NEW: Set image on load if editing ---
+        if (existingFeedback?.product?.imageUrl) {
+          setSelectedProductImage(existingFeedback.product.imageUrl);
         }
       } catch (err) {
         console.error("Failed to fetch categories", err);
       }
     };
     fetchCategories();
-  }, [existingFeedback]); // Re-run if editing
+  }, [existingFeedback]);
   
-  // 2. Fetch products when a category is selected
   const fetchProducts = async (category) => {
     if (!category) {
       setProducts([]);
@@ -44,35 +48,46 @@ function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
     try {
       const res = await axios.get(`http://localhost:5000/api/products?category=${category}`);
       setProducts(res.data);
-      // If not editing, reset product selection
       if (!existingFeedback) setSelectedProduct("");
     } catch (err) {
       console.error("Failed to fetch products", err);
     }
   };
 
-  // 3. Handle category dropdown change
   const handleCategoryChange = (e) => {
     const category = e.target.value;
     setSelectedCategory(category);
-    fetchProducts(category); // Fetch products for this category
+    fetchProducts(category);
+    setSelectedProductImage(null); // <-- NEW: Reset image on category change
   };
 
-  // 4. Handle form submission
+  // --- NEW: Handle product change to set image ---
+  const handleProductChange = (e) => {
+    const productId = e.target.value;
+    setSelectedProduct(productId);
+    
+    if (productId) {
+      const product = products.find(p => p._id === productId);
+      setSelectedProductImage(product.imageUrl);
+    } else {
+      setSelectedProductImage(null);
+    }
+  };
+
   const handleSubmit = (e) => {
+    // ... (handleSubmit logic is unchanged from previous step) ...
     e.preventDefault();
     if (!username || !message || rating === 0 || !selectedProduct || !selectedCategory) {
       alert("Please fill out all fields, including category and product.");
       return;
     }
     
-    // Pass all data up
     onSubmit({ 
       username, 
       message, 
       rating, 
-      product: selectedProduct,  // Send the product ID
-      category: selectedCategory // Send the category name
+      product: selectedProduct,
+      category: selectedCategory
     });
 
     if (!existingFeedback) {
@@ -82,6 +97,7 @@ function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
       setSelectedCategory("");
       setSelectedProduct("");
       setProducts([]);
+      setSelectedProductImage(null); // <-- NEW: Reset image on submit
     }
     if (handleClose) handleClose();
   };
@@ -90,6 +106,17 @@ function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
     <Card className="p-4 mb-4 shadow">
       <Form onSubmit={handleSubmit}>
         <h5 className="mb-3">{existingFeedback ? "Edit" : "Add"} Feedback</h5>
+
+        {/* --- NEW: Image Preview --- */}
+        {selectedProductImage && (
+          <div className="text-center mb-3">
+            <Image 
+              src={selectedProductImage} 
+              style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
+              rounded 
+            />
+          </div>
+        )}
 
         <Row>
           <Col md={6}>
@@ -108,8 +135,8 @@ function FeedbackForm({ onSubmit, existingFeedback, handleClose }) {
               <Form.Label>Product</Form.Label>
               <Form.Select 
                 value={selectedProduct} 
-                onChange={(e) => setSelectedProduct(e.target.value)} 
-                disabled={!selectedCategory} // Disable until category is chosen
+                onChange={handleProductChange} // <-- Use new handler
+                disabled={!selectedCategory} 
               >
                 <option value="">Select Product</option>
                 {products.map(prod => (

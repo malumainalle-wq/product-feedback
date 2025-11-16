@@ -14,7 +14,8 @@ router.get("/", async (req, res) => {
 
     try {
       const feedbacks = await Feedback.find(filters)
-          .populate('product', 'name') // <-- This swaps the product ID for its name
+          // <-- MODIFIED: Also populate imageUrl -->
+          .populate('product', 'name imageUrl') 
           .sort({ createdAt: -1 })
           .limit(limit * 1)
           .skip((page - 1) * limit);
@@ -33,8 +34,8 @@ router.get("/", async (req, res) => {
 });
 
 // GET stats for admin dashboard
+// ... (this route remains the same)
 router.get("/stats", async (req, res) => {
-  // ... (this route remains the same as your file)
   try {
     const totalFeedbacks = await Feedback.countDocuments();
     const avgRatingResult = await Feedback.aggregate([
@@ -50,12 +51,11 @@ router.get("/stats", async (req, res) => {
 
 // POST new feedback
 router.post("/", async (req, res) => {
-    // Now includes product and category
     const { username, message, rating, product, category } = req.body;
     const feedback = await Feedback.create({ username, message, rating, product, category });
     
-    // Populate the product name before sending it back
-    const newFeedback = await Feedback.findById(feedback._id).populate('product', 'name');
+    // <-- MODIFIED: Also populate imageUrl -->
+    const newFeedback = await Feedback.findById(feedback._id).populate('product', 'name imageUrl');
     res.json(newFeedback);
 });
 
@@ -66,13 +66,14 @@ router.put("/:id", auth, async (req, res) => {
     req.params.id,
     { username, message, rating, product, category },
     { new: true }
-  ).populate('product', 'name'); // Also populate on update
+    // <-- MODIFIED: Also populate imageUrl -->
+  ).populate('product', 'name imageUrl');
   res.json(updated);
 });
 
 // DELETE feedback (Protected)
+// ... (this route remains the same)
 router.delete("/:id", auth, async (req, res) => {
-  // ... (this route remains the same as your file)
   await Feedback.findByIdAndDelete(req.params.id);
   res.json({ msg: "Feedback deleted" });
 });

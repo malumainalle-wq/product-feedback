@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { Card, Button, Modal, Row, Col, Badge } from 'react-bootstrap'; // <-- Import Badge
+// <-- Import Image and Badge -->
+import { Card, Button, Modal, Row, Col, Badge, Image } from 'react-bootstrap';
 import { Rating } from 'react-simple-star-rating';
 import FeedbackForm from "./FeedbackForm";
 
@@ -12,9 +13,9 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
   const [showDelete, setShowDelete] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  // ... (all helper functions openEdit, closeEdit, etc. remain the same) ...
   const openEdit = (fb) => { setSelected(fb); setShowEdit(true); };
   const closeEdit = () => setShowEdit(false);
-
   const openDelete = (fb) => { setSelected(fb); setShowDelete(true); };
   const closeDelete = () => setShowDelete(false);
 
@@ -34,6 +35,7 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
     closeDelete();
   };
 
+
   return (
     <div>
       {feedbacks.length === 0 ? (
@@ -41,18 +43,27 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
       ) : (
         feedbacks.map((fb) => (
           <Card key={fb._id} className="p-3 mb-3 shadow-sm">
-            <Row>
+            <Row className="align-items-center">
+              {/* --- NEW Image Column --- */}
+              <Col xs="auto">
+                <Image
+                  src={fb.product?.imageUrl || 'https://via.placeholder.com/100'}
+                  style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                  rounded
+                />
+              </Col>
+
+              {/* --- Main Feedback Content Column --- */}
               <Col>
-                {/* --- NEW PRODUCT/CATEGORY INFO --- */}
                 <div className="mb-2">
                   <Badge bg="secondary" className="me-2">{fb.category}</Badge>
-                  <span className="fw-bold">{fb.product?.name || 'Product'}</span> 
+                  <span className="fw-bold">{fb.product?.name || 'Product'}</span>
                 </div>
-                {/* ---------------------------------- */}
-
                 <h6 className="fw-bold">{fb.username}</h6>
-                <p>{fb.message}</p>
+                <p className="mb-0">{fb.message}</p>
               </Col>
+
+              {/* --- Rating & Admin Column --- */}
               <Col xs="auto" className="text-end">
                 <Rating initialValue={fb.rating} readonly size={25} />
                 {adminMode && (
@@ -73,14 +84,13 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
           <Modal.Title>Edit Feedback</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* Pass the full selected feedback object to the form */}
           <FeedbackForm onSubmit={handleEdit} existingFeedback={selected} handleClose={closeEdit} />
         </Modal.Body>
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      {/* ... (this modal remains the same as your file) ... */}
       <Modal show={showDelete} onHide={closeDelete}>
+        {/* ... (modal content is unchanged) ... */}
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
