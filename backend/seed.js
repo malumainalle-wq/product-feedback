@@ -7,7 +7,7 @@ const Product = require('./models/Product');
 const Feedback = require('./models/Feedback');
 
 const MONGO_URI = "mongodb://127.0.0.1:27017/product_feedback";
-const accessKey = process.env.UNSPLASH_ACCESS_KEY; // <-- Get key from .env
+const accessKey = process.env.UNSPLASH_ACCESS_KEY; 
 
 // Helper function to add a delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

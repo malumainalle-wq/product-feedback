@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
     setIsAuth(true);
   };
 
+  // --- ADD THIS NEW FUNCTION ---
+  const register = async (username, password) => {
+    // This will create the user
+    await axios.post('http://localhost:5000/api/auth/register', { username, password });
+    
+    // After registering, immediately log them in
+    await login(username, password);
+  };
+  // ------------------------------
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -23,7 +33,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, isAuth, login, logout }}>
+    // --- ADD register TO THE VALUE ---
+    <AuthContext.Provider value={{ token, isAuth, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

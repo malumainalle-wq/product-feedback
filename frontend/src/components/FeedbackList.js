@@ -59,7 +59,13 @@ function FeedbackList({ feedbacks, adminMode = false, onFeedbackUpdate }) {
                   <Badge bg="secondary" className="me-2">{fb.category}</Badge>
                   <span className="fw-bold">{fb.product?.name || 'Product'}</span>
                 </div>
-                <h6 className="fw-bold">{fb.username}</h6>
+                {/* --- MODIFIED: Added submission date and time column --- */}
+                <h6 className="fw-bold d-flex justify-content-between align-items-center">
+                  <span>{fb.username}</span>
+                  <small className="text-muted fw-normal">
+                    Submitted: {new Date(fb.createdAt).toLocaleString()}
+                  </small>
+                </h6>
                 <p className="mb-0">{fb.message}</p>
               </Col>
 

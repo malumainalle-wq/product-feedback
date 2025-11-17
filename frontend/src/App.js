@@ -1,6 +1,4 @@
 // frontend/src/App.js
-// (Paste this code into your App.js file)
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -9,6 +7,7 @@ import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import RegisterPage from './components/RegisterPage'; // <-- 1. IMPORT
 
 function App() {
   return (
@@ -17,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} /> {/* <-- 2. ADD ROUTE */}
         <Route 
           path="/admin" 
           element={
